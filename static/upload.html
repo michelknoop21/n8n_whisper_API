@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Transcriptie - HEIDENHAIN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        /* HEIDENHAIN Kleuren */
+        :root {
+            --heidenhain-dark: #373737;
+            --heidenhain-darker: #2c2c2c;
+            --heidenhain-accent: #b3b441;
+            --heidenhain-text: #ffffff;
+        }
+
+        /* Toepassen van de kleuren */
+        body {
+            background-color: var(--heidenhain-dark);
+            color: var(--heidenhain-text);
+            font-family: sans-serif;
+        }
+        .bg-hh-dark { background-color: var(--heidenhain-dark); }
+        .bg-hh-darker { background-color: var(--heidenhain-darker); }
+        .bg-hh-accent { background-color: var(--heidenhain-accent); }
+        
+        /* Button styling */
+        .btn-hh {
+            background-color: var(--heidenhain-accent);
+            color: var(--heidenhain-text);
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.25rem;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        .btn-hh:hover {
+            filter: brightness(110%);
+        }
+        
+        .file-input-hh::file-selector-button {
+            background-color: var(--heidenhain-accent);
+            color: var(--heidenhain-text);
+            border: 0;
+            padding: 0.5rem 1rem;
+            margin-right: 1rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: background-color 0.2s;
+        }
+        .file-input-hh::file-selector-button:hover {
+            filter: brightness(110%);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <header class="bg-hh-darker shadow-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+             <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARAAAABDCAMAAACfAwT3AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAKeUExURQAAAP///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////y2+4JkAAAA/dFJOUwADBxEYHCEnMDw/REtUY2Vpc3uCjpSdo623vb/FyMnN0dnc4uXn6uvw8/T29/j5+vv8/f7+RAjHAAAEZElEQVR42u2d65qrIBCFRzEgKCIgKCiivff+/3d3p3SWK5mGZpLndJaZWZzKG5f0Jv1dY2NjY2NjY2Pj//2oWNe19y/O9z8B8vX4ve7r3P517U36G0TqW42gfrNpqB8tBuo7jUDRaABUNBqAFE0GoGg0ACgaDUClTqMBUNFoAEI0GoCi0QCgaDQAKRoNQFGn0QDUajQARRoNQFGn0QCIaDQAaRoNQBmNBlBGo9EAxGk0gLQaDWCsRqMBKNFoAMo0GkCjRqMBKNFoAIo0GoCSTqMBKNFoAFo0GoASjQagcKPRANRoNACFGg1AGY0GMEaj0QCkaDSAhhoNoFGjAQjSaACNNBrAUY0GEKTRACxoNAA1Gg2gUaMBKNFoAEo0GkDDjQYgRKMBpGk0AMUajQYgSaMBKNFoAAo1GgAjGg1AmUYDyNBozJb2r6s9X/c03n305z/P279v/b178V3v43t49+Kz3+N30J/z9f1f/f3lJ/+N30F/r3/vXvx276N78Vmv8/u3v734zL34bW6/+lrv47vowZ7f11/xLnzW6/yG3x/9Gu/ju/Be7+P78Lte5/drf/vevfid3of34LNe5/fpv3ovftfr/Pbd33vxb73O79v+1le/+tovf9fr/L7t3/devQ/vxWe9zu/Lf9devft779579d579R/sxWe/x+9b//Zevftbr/P71r/9l/fi972P78NnvcfvW//2X72P3+vde1/+x+99e19e/H7v20u34vte5/et/+vdfvnevfcuvfuu//O9e9+9+N17730I73r33qf37r1rL9971x689+rde6/ei3etde9d/s579169F9/13r33LnxnvXvv3nv3vv2uu/e+vXvv3nv3vv0u/8+9e9+9++y9e9+9+O51691775737r1rL96716516917336X169169371r79Lq/e/ffuc+/e+9a69+59+11e/ffus/fufevd+/a+/S6vXvv3vv0ur1/r1rv37n37XV6/1q137337XV719+6z9+5969279r79Lq/e+/e+/S6vX+vWu/eufftdXr/W7b377L171779Lq9f6/bevffus/fufevdu/bevfeuffvffpdXr/X7b3/v3qf37n37XV6/9u29e+/fZ+/d+9a7d+19+11ev/btvXvv3qf37n37XV6/1u29e+9e+y6vX+v2vv2uu/e+vXvv3nv3vv0ur97r9r79Lq9f6/a+fe+/S+vXuv2uu7/36nX7XV799t3/N69f63a+/S6vX+v2v/3vv3vv2vv3vr1ev9bt//zuvfffvfevfevfevfuvffuvffuvfvv/e/fe/fevfevfevfevfuvffuvffvvfuffvfevfevvXvv3vv3vv0ur1/r9r79//1v7/37/1737v37n17773/7717/9771r+13+X1e+/eu/fue/fee/f+/W/vw/vu//vv3v/H9+69e+/e+/d+/a+/e+//+T+/d+//+9f6ve/vvXvv3vv3vv1v7/0bHxsbGxsbGxt/B/iXwxGubwntvy8AAAAASUVORK5CYII=" alt="HEIDENHAIN Logo" style="height: 30px;">
+            <h1 class="text-xl font-bold uppercase">Audio Transcriptie Tool</h1>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto bg-hh-darker rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-bold mb-6 text-center uppercase">Audio uploaden voor transcriptie</h2>
+            
+            <form id="uploadForm" class="space-y-6">
+                <!-- Bestandsselectie met drag & drop -->
+                <div>
+                    <label class="block text-sm font-bold uppercase mb-2">
+                        Selecteer audiobestand
+                    </label>
+                    <div id="dropZone" class="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center cursor-pointer hover:border-hh-accent transition-colors">
+                        <input id="audioFile" name="audioFile" type="file" class="hidden" accept="audio/*,video/*" />
+                        <div class="space-y-2">
+                            <div class="mx-auto w-12 h-12 bg-hh-accent/20 rounded-full flex items-center justify-center">
+                                <i class="fas fa-file-audio text-hh-accent text-xl"></i>
+                            </div>
+                            <p class="text-sm text-gray-300">
+                                <span class="text-hh-accent font-medium">Klik om te uploaden</span> of sleep een bestand hierheen
+                            </p>
+                            <p id="fileName" class="text-xs text-gray-400 mt-2">Ondersteunde formaten: MP3, WAV, MP4, etc. (max. 50MB)</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Voorbeeldbestanden -->
+                    <div class="mt-4">
+                        <p class="text-sm text-gray-400 mb-2">Of probeer een voorbeeld:</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <button type="button" class="text-left p-3 bg-hh-darker hover:bg-gray-700 rounded-lg border border-gray-700 text-sm transition-colors" onclick="loadExample('example1')">
+                                <div class="font-medium text-white">Voorbeeld 1</div>
+                                <div class="text-xs text-gray-400">Nederlands gesprek (15 sec)</div>
+                            </button>
+                            <button type="button" class="text-left p-3 bg-hh-darker hover:bg-gray-700 rounded-lg border border-gray-700 text-sm transition-colors" onclick="loadExample('example2')">
+                                <div class="font-medium text-white">Voorbeeld 2</div>
+                                <div class="text-xs text-gray-400">Engelse presentatie (30 sec)</div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <button  
+                    type="submit"  
+                    class="w-full btn-hh"
+                >
+                    Upload en Transcribeer
+                </button>
+            </form>
+
+            <!-- Status indicator -->
+            <div id="status" class="mt-6 p-4 bg-hh-darker/80 border border-gray-700 rounded-lg hidden">
+                <div class="flex items-center space-x-4">
+                    <div class="w-6 h-6 border-4 border-hh-accent border-t-transparent rounded-full animate-spin"></div>
+                    <div class="flex-1">
+                        <p id="statusText" class="text-gray-200 font-medium">Bestand verwerken...</p>
+                        <div class="w-full bg-gray-700/50 rounded-full h-2 mt-2 overflow-hidden">
+                            <div id="progress" class="bg-hh-accent h-full rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Error message -->
+            <div id="error" class="mt-6 hidden">
+                <div class="bg-red-900/80 border-l-4 border-red-500 text-red-100 p-4 rounded-r-lg flex items-start">
+                    <i class="fas fa-exclamation-triangle text-xl mr-3 mt-0.5"></i>
+                    <div>
+                        <p class="font-bold">Er is een fout opgetreden</p>
+                        <p id="errorMessage" class="text-sm mt-1"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result section -->
+            <div id="result" class="mt-6 hidden">
+                <div class="p-4 bg-hh-darker rounded-lg border border-gray-700">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                        <h3 class="text-lg font-bold text-white uppercase">Transcriptie</h3>
+                        <div class="flex space-x-2 w-full sm:w-auto">
+                            <button id="copyBtn" class="text-sm bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded flex items-center transition-colors">
+                                <i class="far fa-copy mr-1.5"></i> Kopiëren
+                            </button>
+                            <a id="downloadBtn" href="#" class="text-sm bg-hh-accent hover:bg-yellow-600 text-white px-3 py-1.5 rounded flex items-center transition-colors">
+                                <i class="fas fa-download mr-1.5"></i> Opslaan
+                            </a>
+                        </div>
+                    </div>
+                    <div id="transcript" class="whitespace-pre-line bg-hh-dark/50 text-gray-300 p-4 rounded-lg border border-gray-700 font-mono max-h-96 overflow-y-auto"></div>
+                    
+                    <div class="mt-3 text-xs text-gray-400 flex items-center">
+                        <i class="fas fa-info-circle mr-1.5"></i>
+                        <span>Deze transcriptie is automatisch gegenereerd en kan onnauwkeurigheden bevatten.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-hh-dark">
+        <div class="container mx-auto py-8 px-4 text-center">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARAAAABDCAMAAACfAwT3AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAKeUExURQAAAP///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////y2+4JkAAAA/dFJOUwADBxEYHCEnMDw/REtUY2Vpc3uCjpSdo623vb/FyMnN0dnc4uXn6uvw8/T29/j5+vv8/f7+RAjHAAAEZElEQVR42u2d65qrIBCFRzEgKCIgKCiivff+/3d3p3SWK5mGZpLndJaZWZzKG5f0Jv1dY2NjY2NjY2Pj//2oWNe19y/O9z8B8vX4ve7r3P517U36G0TqW42gfrNpqB8tBuo7jUDRaABUNBqAFE0GoGg0ACgaDUClTqMBUNFoAEI0GoCi0QCgaDQAKRoNQFGn0QDUajQARRoNQFGn0QCIaDQAaRoNQBmNBlBGo9EAxGk0gLQaDWCsRqMBKNFoAMo0GkCjRqMBKNFoAIo0GoCSTqMBKNFoAFo0GoASjQagcKPRANRoNACFGg1AGY0GMEaj0QCkaDSAhhoNoFGjAQjSaACNNBrAUY0GEKTRACxoNAA1Gg2gUaMBKNFoAEo0GkDDjQYgRKMBpGk0AMUajQYgSaMBKNFoAAo1GgAjGg1AmUYDyNBozJb2r6s9X/c03n305z/P279v/b178V3v43t49+Kz3+N30J/z9f1f/f3lJ/+N30F/r3/vXvx276N78Vmv8/u3v734zL34bW6/+lrv47vowZ7f11/xLnzW6/yG3x/9Gu/ju/Be7+P78Lte5/drf/vevfid3of34LNe5/fpv3ovftfr/Pbd33vxb73O79v+1le/+tovf9fr/L7t3/devQ/vxWe9zu/Lf9devft779579d579R/sxWe/x+9b//Zevftbr/P71r/9l/fi972P78NnvcfvW//2X72P3+vde1/+x+99e19e/H7v20u34vte5/et/+vdfvnevfcuvfuu//O9e9+9+N17730I73r33qf37r1rL9971x689+rde6/ei3etde9d/s579169F9/13r33LnxnvXvv3nv3vv2uu/e+vXvv3nv3vv0u/8+9e9+9++y9e9+9+O51691775737r1rL96716516917336X169169371r79Lq/e/ffuc+/e+9a69+59+11e/ffus/fufevd+/a+/S6vXvv3vv0ur1/r1rv37n37XV6/1q137337XV719+6z9+5969279r79Lq/e+/e+/S6vX+vWu/eufftdXr/W7b377L171779Lq9f6/bevffus/fufevdu/bevfeuffvffpdXr/X7b3/v3qf37n37XV6/9u29e+/fZ+/d+9a7d+19+11ev/btvXvv3qf37n37XV6/1u29e+9e+y6vX+v2vv2uu/e+vXvv3nv3vv0ur97r9r79Lq9f6/a+fe+/S+vXuv2uu7/36nX7XV799t3/N69f63a+/S6vX+v2v/3vv3vv2vv3vr1ev9bt//zuvfffvfevfevfevfuvffuvffuvfvv/e/fe/fevfevfevfevfuvffuvffvvfuffvfevfevvXvv3vv3vv0ur1/r9r79//1v7/37/1737v37n17773/7717/9771r+13+X1e+/eu/fue/fee/f+/W/vw/vu//vv3v/H9+69e+/e+/d+/a+/e+//+T+/d+//+9f6ve/vvXvv3vv3vv1v7/0bHxsbGxsbGxt/B/iXwxGubwntvy8AAAAASUVORK5CYII=" alt="HEIDENHAIN Logo" class="mx-auto" style="height: 33px;">
+            <p class="font-bold mt-2 text-white">Mastering nanometer accuracy</p>
+        </div>
+        <div class="bg-hh-darker">
+            <div class="container mx-auto px-4 py-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 items-center text-center gap-4">
+                    <div class="text-xs text-gray-400 md:text-left">
+                        &copy; HEIDENHAIN 2025
+                    </div>
+                    <div class="flex justify-center md:justify-end space-x-4">
+                        <a href="#" class="text-white hover:text-gray-300">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                        </a>
+                        <a href="#" class="text-white hover:text-gray-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Font Awesome voor icoontjes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <script>
+        // Initialize file input handling
+        document.addEventListener('DOMContentLoaded', function() {
+            // Copy to clipboard functionality
+            const copyBtn = document.getElementById('copyBtn');
+            copyBtn.addEventListener('click', async () => {
+                const transcript = document.getElementById('transcript').textContent;
+                try {
+                    await navigator.clipboard.writeText(transcript);
+                    
+                    // Update button text and icon temporarily
+                    const originalHTML = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="fas fa-check mr-1.5"></i> Gekopieerd!';
+                    copyBtn.classList.remove('bg-gray-700', 'hover:bg-gray-600');
+                    copyBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                    
+                    // Reset button after 2 seconds
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalHTML;
+                        copyBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                        copyBtn.classList.add('bg-gray-700', 'hover:bg-gray-600');
+                    }, 2000);
+                } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                    showError('Kon tekst niet kopiëren naar klembord');
+                }
+            });
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('audioFile');
+            const fileName = document.getElementById('fileName');
+            
+            // Handle file selection via button
+            dropZone.addEventListener('click', () => fileInput.click());
+            
+            // Handle file input change
+            fileInput.addEventListener('change', (e) => {
+                if (fileInput.files.length > 0) {
+                    updateFileName(fileInput.files[0].name);
+                }
+            });
+            
+            // Handle drag and drop
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            // Highlight drop zone when item is dragged over it
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, unhighlight, false);
+            });
+            
+            // Handle dropped files
+            dropZone.addEventListener('drop', handleDrop, false);
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            function highlight() {
+                dropZone.classList.add('border-hh-accent', 'bg-hh-darker/50');
+            }
+            
+            function unhighlight() {
+                dropZone.classList.remove('border-hh-accent', 'bg-hh-darker/50');
+            }
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files.length) {
+                    fileInput.files = files;
+                    updateFileName(files[0].name);
+                }
+            }
+            
+            function updateFileName(name) {
+                fileName.textContent = name || 'Geen bestand geselecteerd';
+            }
+        });
+        
+        // Load example file
+        function loadExample(exampleId) {
+            // Reset any previous state
+            document.getElementById('result').classList.add('hidden');
+            document.getElementById('error').classList.add('hidden');
+            
+            // Show loading state
+            showStatus('Voorbeeld wordt geladen...', 'uploading');
+            
+            // Example file URLs (replace with actual example files)
+            const examples = {
+                example1: 'https://example.com/path/to/example1.mp3',
+                example2: 'https://example.com/path/to/example2.mp3'
+            };
+            
+            // Simulate file selection (in a real app, you would fetch the example file)
+            setTimeout(() => {
+                const exampleName = exampleId === 'example1' ? 'nederlands-gesprek.mp3' : 'engelse-presentatie.mp3';
+                document.getElementById('fileName').textContent = `Voorbeeld: ${exampleName}`;
+                
+                // Simulate processing
+                setTimeout(() => {
+                    showStatus('Voorbeeld wordt verwerkt...', 'processing');
+                    
+                    // Simulate completion after a delay
+                    setTimeout(() => {
+                        const exampleText = exampleId === 'example1' 
+                            ? "Hallo, dit is een voorbeeld van een Nederlands gesprek.\n\nHet is bedoeld om te laten zien hoe de transcriptie eruit zal zien."
+                            : "Hello, this is an example of an English presentation.\n\nIt's designed to show you how the transcription will look like.";
+                        
+                        showStatus('Transcriptie voltooid!', 'success');
+                        showResult(exampleText);
+                    }, 2000);
+                }, 1000);
+            }, 500);
+        }
+        // API configuration - altijd poort 5000 gebruiken voor de API
+        const API_BASE_URL = 'http://localhost:5000';
+        const API_KEY = 'hofP20MHXVh5ZhI30QXHA_ly_zqG__ktnQtQpwmXnoo';
+        
+        // DOM elements
+        const form = document.getElementById('uploadForm');
+        const status = document.getElementById('status');
+        const statusText = document.getElementById('statusText');
+        const progressBar = document.getElementById('progress');
+        const result = document.getElementById('result');
+        const transcript = document.getElementById('transcript');
+        const error = document.getElementById('error');
+        const errorMessage = document.getElementById('errorMessage');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        // Handle form submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('audioFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showError('Selecteer eerst een audiobestand');
+                return;
+            }
+
+            // Reset UI
+            showStatus('Bezig met uploaden...', 'uploading');
+            document.getElementById('result').classList.add('hidden');
+            document.getElementById('error').classList.add('hidden');
+            
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                // Show upload progress
+                const xhr = new XMLHttpRequest();
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const percentComplete = Math.round((e.loaded / e.total) * 100);
+                        document.getElementById('progress').style.width = `${percentComplete}%`;
+                    }
+                });
+
+                // Start the upload
+                showStatus('Bestand uploaden...', 'uploading');
+                
+                const response = await fetch(`${API_BASE_URL}/api/transcribe`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Admin-API-Key': API_KEY
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.detail || `Serverfout: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.status === 'completed') {
+                    showStatus('Transcriptie voltooid!', 'success');
+                    showResult(data.transcription || 'Geen tekst gevonden');
+                } else if (data.status === 'processing') {
+                    // If the API returns a task ID, poll for updates
+                    showStatus('Bestand wordt verwerkt...', 'processing');
+                    await checkTranscriptionStatus(data.task_id);
+                }
+                
+            } catch (err) {
+                showError(`Fout bij het verwerken: ${err.message}`);
+                console.error('Transcription error:', err);
+            }
+        });
+        
+        // Check transcription status for async processing
+        async function checkTranscriptionStatus(taskId, attempt = 1) {
+            const MAX_ATTEMPTS = 30; // Max 30 attempts (about 1 minute with 2s delay)
+            const RETRY_DELAY = 2000; // 2 seconds
+            
+            try {
+                // Update status with attempt counter
+                showStatus(`Bestand wordt verwerkt (poging ${attempt}/${MAX_ATTEMPTS})...`, 'processing');
+                
+                const response = await fetch(`${API_BASE_URL}/api/status/${taskId}`, {
+                    headers: {
+                        'X-Admin-API-Key': API_KEY,
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Kan de status niet ophalen van de server');
+                }
+                
+                const result = await response.json();
+                
+                if (result.status === 'completed') {
+                    // Update progress to 100%
+                    document.getElementById('progress').style.width = '100%';
+                    showStatus('Transcriptie voltooid!', 'success');
+                    showResult(result.transcription || 'Geen tekst gevonden');
+                } else if (result.status === 'processing') {
+                    if (attempt >= MAX_ATTEMPTS) {
+                        throw new Error('Het duurt te lang om het bestand te verwerken. Probeer het later opnieuw.');
+                    }
+                    
+                    // Update progress (start at 70% and move towards 95% based on attempts)
+                    const progress = 70 + Math.min(25, (attempt / MAX_ATTEMPTS) * 25);
+                    document.getElementById('progress').style.width = `${progress}%`;
+                    
+                    // Poll again after a delay
+                    setTimeout(() => checkTranscriptionStatus(taskId, attempt + 1), RETRY_DELAY);
+                } else if (result.status === 'failed') {
+                    throw new Error('Transcriptie mislukt: ' + (result.error || 'Onbekende fout'));
+                } else {
+                    throw new Error('Onverwachte status: ' + result.status);
+                }
+                
+            } catch (error) {
+                console.error('Status check error:', error);
+                
+                if (attempt < MAX_ATTEMPTS) {
+                    // Retry on temporary errors
+                    console.log(`Retrying... (${attempt}/${MAX_ATTEMPTS})`);
+                    setTimeout(() => checkTranscriptionStatus(taskId, attempt + 1), RETRY_DELAY);
+                } else {
+                    showError(`Fout: ${error.message}`);
+                }
+            }
+        }
+        
+        // Show the transcription result
+        function showResult(text) {
+            const resultElement = document.getElementById('result');
+            const transcriptElement = document.getElementById('transcript');
+            const downloadBtn = document.getElementById('downloadBtn');
+            
+            // Format the text with line breaks for better readability
+            const formattedText = text
+                .replace(/\n\s*\n/g, '\n\n') // Preserve double line breaks
+                .trim();
+            
+            // Display the formatted text
+            transcriptElement.textContent = formattedText;
+            
+            // Set up download button
+            if (formattedText) {
+                const blob = new Blob([formattedText], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                
+                downloadBtn.href = url;
+                downloadBtn.download = `transcriptie-${new Date().toISOString().slice(0, 10)}.txt`;
+                downloadBtn.classList.remove('hidden');
+                
+                // Clean up the URL object when the download is complete
+                downloadBtn.addEventListener('click', function onClick() {
+                    setTimeout(() => URL.revokeObjectURL(url), 100);
+                }, { once: true });
+            } else {
+                downloadBtn.classList.add('hidden');
+            }
+            
+            // Show the result container with a nice animation
+            resultElement.classList.remove('hidden');
+            resultElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        // Helper function to show status messages
+        function showStatus(message, type = 'info') {
+            const statusElement = document.getElementById('status');
+            const statusTextElement = document.getElementById('statusText');
+            const progressBar = document.getElementById('progress');
+            
+            // Update status text
+            statusTextElement.textContent = message;
+            
+            // Show/hide status based on type
+            if (type === 'error') {
+                statusElement.classList.add('hidden');
+                showError(message);
+                return;
+            } else if (type === 'success') {
+                // For success, we'll hide the status after a short delay
+                setTimeout(() => {
+                    statusElement.classList.add('hidden');
+                }, 2000);
+            } else {
+                // For info/processing, make sure it's visible
+                statusElement.classList.remove('hidden');
+            }
+            
+            // Update progress bar if needed
+            if (type === 'processing') {
+                progressBar.style.width = '70%';
+            } else if (type === 'success') {
+                progressBar.style.width = '100%';
+            }
+            
+            // Hide error if showing status
+            document.getElementById('error').classList.add('hidden');
+        }
+        
+        // Helper function to show error messages
+        function showError(message) {
+            const errorElement = document.getElementById('error');
+            const errorMessageElement = document.getElementById('errorMessage');
+            
+            // Update error message
+            errorMessageElement.textContent = message;
+            
+            // Show error and hide status
+            errorElement.classList.remove('hidden');
+            document.getElementById('status').classList.add('hidden');
+            
+            // Log to console for debugging
+            console.error('Error:', message);
+        }
+    </script>
+    
+</body>
+</html>
