@@ -1,6 +1,9 @@
-from fastapi import FastAPI, HTTPException, UploadFile, File, Header, Request, BackgroundTasks, APIRouter, status
+from fastapi import FastAPI, HTTPException, UploadFile, File, Header, Request, BackgroundTasks, APIRouter, status, Form
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel, BaseSettings
 from typing import Optional, Dict, List, Tuple
 import torch
 from transformers import pipeline
@@ -15,10 +18,24 @@ import mimetypes
 import logging
 import subprocess
 import shutil
+import json
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Admin settings
+class Settings(BaseSettings):
+    admin_webhook_url: str = ""
+    admin_api_key: str = os.getenv("ADMIN_KEY", "test123")  # Default waarde voor testen
+    
+    class Config:
+        env_file = ".env"
+        env_file_encoding = 'utf-8'
+        case_sensitive = False
+
+settings = Settings()
+logger.info(f"API Key loaded: {'*' * len(settings.admin_api_key) if settings.admin_api_key else 'None'}")
 
 # Supported audio formats
 SUPPORTED_AUDIO_TYPES = [
@@ -209,7 +226,7 @@ async def validate_uploaded_file(file: UploadFile) -> dict:
 async def transcribe_audio(
     background_tasks: BackgroundTasks,
     file: Optional[UploadFile] = File(None),
-    request: Optional[TranscriptionRequest] = None,
+    request: Request = None,
     x_admin_api_key: str = Header(None)
 ):
     # Validate API key
@@ -217,106 +234,119 @@ async def transcribe_audio(
         raise HTTPException(status_code=401, detail="Invalid API key")
     
     # Check if either file or URL is provided
-    if file is None and (request is None or request.url is None):
-        raise HTTPException(status_code=400, detail="Either file or URL must be provided")
+    if file is None:
+        raise HTTPException(status_code=400, detail="No file provided")
     
     # Generate task ID
     task_id = str(uuid.uuid4())
     
     try:
-        if file:
-            # Create temp directory if it doesn't exist
-            temp_dir = Path(tempfile.gettempdir()) / "whisper_uploads"
-            temp_dir.mkdir(exist_ok=True, parents=True)
-            
+        # Create temp directory if it doesn't exist
+        temp_dir = Path(tempfile.gettempdir()) / "whisper_uploads"
+        temp_dir.mkdir(exist_ok=True, parents=True)
+        
+        # Save uploaded file
+        temp_file = temp_dir / f"audio_{task_id}_{file.filename}"
+        output_file = temp_file.with_suffix('.wav')
+        
+        try:
             # Save uploaded file
-            temp_file = temp_dir / f"audio_{task_id}_{file.filename}"
-            output_file = temp_file.with_suffix('.wav')
+            with open(temp_file, "wb") as buffer:
+                content = await file.read()
+                buffer.write(content)
             
+            logger.info(f"File saved to {temp_file}")
+            
+            # Get the language from the form data
+            form_data = await request.form()
+            language = form_data.get('language', 'nl')  # Default to Dutch if not provided
+            logger.info(f"Language: {language}")
+            
+            # Validate file and check if conversion is needed
+            file_info = await validate_uploaded_file(file)
+            
+            # Convert audio if needed
+            if file_info['needs_conversion']:
+                logger.info(f"Converting {temp_file} to WAV format...")
+                convert_audio(str(temp_file), str(output_file))
+                # Remove original file after conversion
+                temp_file.unlink()
+            else:
+                output_file = temp_file
+            
+            # Get the transcription pipeline
+            pipeline = get_whisper_pipeline()
+                
             try:
-                # Save uploaded file
-                with open(temp_file, "wb") as buffer:
-                    content = await file.read()
-                    buffer.write(content)
-                
-                logger.info(f"File saved to {temp_file}")
-                
-                # Validate file and check if conversion is needed
-                file_info = await validate_uploaded_file(file)
-                
-                # Convert audio if needed
-                if file_info['needs_conversion']:
-                    logger.info(f"Converting {temp_file} to WAV format...")
-                    convert_audio(str(temp_file), str(output_file))
-                    # Remove original file after conversion
-                    temp_file.unlink()
-                else:
-                    output_file = temp_file
-                
-                # Get the transcription pipeline
-                pipeline = get_whisper_pipeline()
-                
-                # Get language from form data or use auto-detect
-                language = 'nl'  # Default to Dutch
-                
                 # Log the language being used
                 logger.info(f"Starting transcription of {output_file} (language: {language or 'auto'})...")
                 
                 try:
                     # Prepare generation kwargs
-                    generate_kwargs = {"language": language} if language else {}
+                    generate_kwargs = {
+                        "task": "transcribe",
+                        "return_timestamps": True,
+                        "chunk_length_s": 30,
+                        "batch_size": 16,
+                        "language": language if language and language != "auto" else None,
+                    }
                     
+                    # Run transcription
+                    logger.info("Starting transcription...")
                     result = pipeline(
                         str(output_file),
-                        batch_size=16,  # Reduced batch size for better memory management
-                        return_timestamps=False,
-                        generate_kwargs=generate_kwargs if generate_kwargs else None
+                        **generate_kwargs
                     )
                     
-                    # Log the raw result for debugging
-                    logger.info(f"Raw transcription result: {result}")
+                    # Format the result
+                    segments = []
+                    for segment in result["chunks"]:
+                        segments.append({
+                            "start": segment["timestamp"][0],
+                            "end": segment["timestamp"][1],
+                            "text": segment["text"].strip()
+                        })
                     
-                    # Ensure we have text in the result
-                    if not result or 'text' not in result or not result['text'].strip():
-                        logger.warning("No text was transcribed. The audio might be silent or contain no speech.")
-                        result['text'] = "Geen spraak herkend in het audiobestand."
-                    else:
-                        logger.info("Transcription completed successfully")
-                        
+                    # Clean up the output file
+                    output_file.unlink()
+                    
+                    return {
+                        "task_id": task_id,
+                        "status": "completed",
+                        "text": result["text"],
+                        "segments": segments,
+                        "language": language or "auto"
+                    }
+                    
                 except Exception as e:
                     logger.error(f"Error during transcription: {str(e)}")
-                    raise
-                
-                return TranscriptionResponse(
-                    text=result["text"],
-                    task_id=task_id,
-                    status="completed",
-                    created_at=datetime.utcnow(),
-                )
-                
+                    raise HTTPException(
+                        status_code=500,
+                        detail=f"Error during transcription: {str(e)}"
+                    )
+                    
             except Exception as e:
-                logger.error(f"Error during transcription: {str(e)}", exc_info=True)
+                logger.error(f"Error processing file: {str(e)}")
                 raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                    detail=f"Fout bij het verwerken van het audiobestand: {str(e)}"
+                    status_code=500,
+                    detail=f"Error processing file: {str(e)}"
                 )
                 
-            finally:
-                # Clean up
-                try:
-                    if temp_file.exists():
-                        temp_file.unlink()
-                except Exception as e:
-                    logger.warning(f"Failed to delete temp file {temp_file}: {e}")
+        except Exception as e:
+            logger.error(f"Unexpected error: {str(e)}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"An unexpected error occurred: {str(e)}"
+            )
             
-        elif request and request.url:
-            # Handle URL transcription (async)
-            if request.is_async:
-                background_tasks.add_task(process_async_transcription, request, task_id)
-                return {"task_id": task_id, "status": "processing"}
-            else:
-                return await process_sync_transcription(request, task_id)
-    
+        finally:
+            # Clean up
+            try:
+                if temp_file.exists():
+                    temp_file.unlink()
+            except Exception as e:
+                logger.warning(f"Failed to delete temp file {temp_file}: {e}")
+            
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -359,6 +389,14 @@ async def process_async_transcription(request: TranscriptionRequest, task_id: st
         # Log the error
         print(f"Error in async transcription: {e}")
 
+@api_router.get("/api/config")
+async def get_config():
+    """Get frontend configuration (including API key if needed)."""
+    return {
+        "apiKeyRequired": True,
+        "maxFileSize": 50 * 1024 * 1024  # 50MB
+    }
+
 @api_router.get("/health")
 async def health_check():
     """Health check endpoint."""
@@ -378,6 +416,123 @@ async def get_task_status(task_id: str):
 async def cancel_task(task_id: str):
     # Implement task cancellation
     return {"status": "cancelled"}
+
+# Middleware voor API key validatie
+@app.middleware("http")
+async def validate_api_key(request: Request, call_next):
+    # Skip API key check for health check and static files
+    if request.url.path in ['/health', '/api/config'] or request.url.path.startswith('/static/'):
+        return await call_next(request)
+        
+    # Check for API key in headers
+    api_key = request.headers.get('x-admin-api-key')
+    if not api_key or api_key != settings.admin_api_key:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Ongeldige of ontbrekende API key"
+        )
+    
+    return await call_next(request)
+
+# Create FastAPI app
+app = FastAPI(title="Insanely Fast Whisper API")
+
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8000", "http://127.0.0.1:8000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"]
+)
+
+# Mount static files
+app.mount("/static", StaticFiles(directory="/app/static"), name="static")
+
+# Templates
+try:
+    templates = Jinja2Templates(directory="/app/static/templates")
+except Exception as e:
+    logger.error(f"Failed to load templates: {e}")
+    # Create a minimal template
+    templates = None
+
+# API endpoints
+@app.get("/api/config")
+async def get_config():
+    """Return frontend configuration"""
+    return {
+        "apiKeyRequired": bool(settings.admin_api_key),
+        "maxFileSize": MAX_FILE_SIZE,
+        "supportedAudioTypes": SUPPORTED_AUDIO_TYPES
+    }
+
+# Admin routes
+@app.get("/admin", response_class=HTMLResponse)
+async def admin_ui(request: Request):
+    return templates.TemplateResponse("admin.html", {
+        "request": request, 
+        "webhook_url": settings.admin_webhook_url,
+        "admin_api_key": settings.admin_api_key
+    })
+
+@app.post("/admin/save")
+async def save_settings(webhook_url: str = Form(...), x_admin_api_key: str = Header(None)):
+    if x_admin_api_key != settings.admin_api_key:
+        raise HTTPException(status_code=401, detail="Invalid API key")
+    
+    settings.admin_webhook_url = webhook_url
+    # Save to .env file or another persistent storage
+    with open(".env", "w") as f:
+        f.write(f"ADMIN_WEBHOOK_URL={webhook_url}\n")
+    
+    return {"status": "success", "message": "Settings saved successfully"}
+
+# Webhook endpoint for n8n
+@api_router.post("/webhook/transcribe")
+async def webhook_transcribe(file: UploadFile = File(...), x_admin_api_key: str = Header(None)):
+    if x_admin_api_key != settings.admin_api_key:
+        raise HTTPException(status_code=401, detail="Invalid API key")
+    
+    # Process the file using existing transcribe function
+    task_id = str(uuid.uuid4())
+    temp_dir = Path(tempfile.gettempdir()) / "whisper_uploads"
+    temp_dir.mkdir(exist_ok=True, parents=True)
+    
+    temp_file = temp_dir / f"webhook_audio_{task_id}_{file.filename}"
+    output_file = temp_file.with_suffix('.wav')
+    
+    try:
+        with open(temp_file, "wb") as buffer:
+            content = await file.read()
+            buffer.write(content)
+        
+        # Convert if needed
+        if temp_file.suffix.lower() != '.wav':
+            output_file = convert_audio(str(temp_file), str(output_file))
+            temp_file.unlink()
+        else:
+            output_file = temp_file
+        
+        # Transcribe
+        pipeline = get_whisper_pipeline()
+        result = pipeline(
+            str(output_file),
+            batch_size=16,
+            return_timestamps=False,
+            generate_kwargs={"language": "nl"}
+        )
+        
+        # Cleanup
+        if output_file.exists():
+            output_file.unlink()
+        
+        return {"transcript": result["text"], "status": "completed"}
+        
+    except Exception as e:
+        logger.error(f"Webhook transcription error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Include the API router
 app.include_router(api_router)

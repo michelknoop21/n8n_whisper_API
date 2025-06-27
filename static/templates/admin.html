@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Whisper API</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <nav class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex">
+                        <div class="flex-shrink-0 flex items-center">
+                            <h1 class="text-xl font-bold text-gray-900">Whisper API Admin</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="py-10">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white shadow rounded-lg p-6 mb-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Webhook Instellingen</h2>
+                    <form id="settingsForm" class="space-y-4">
+                        <div>
+                            <label for="webhookUrl" class="block text-sm font-medium text-gray-700">n8n Webhook URL</label>
+                            <input type="text" id="webhookUrl" name="webhookUrl" 
+                                   value="{{ webhook_url }}" 
+                                   class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <p class="mt-2 text-sm text-gray-500">Voer de volledige URL in van je n8n webhook</p>
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                Opslaan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="bg-white shadow rounded-lg p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">API Gebruik</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-700">Webhook URL</h3>
+                            <div class="mt-1 flex rounded-md shadow-sm">
+                                <input type="text" readonly value="http://[JOUW_DOMEIN]/api/webhook/transcribe" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-l-md border border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                                <button onclick="copyToClipboard('http://[JOUW_DOMEIN]/api/webhook/transcribe')" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 rounded-r-md">
+                                    Kopiëren
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-700">API Sleutel</h3>
+                            <div class="mt-1 relative rounded-md shadow-sm">
+                                <input type="password" readonly value="{{ admin_api_key }}" id="apiKey" class="block w-full pr-10 sm:text-sm border-gray-300 rounded-md">
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                    <button onclick="toggleApiKey()" type="button" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                                            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </button>
+                                    <button onclick="copyToClipboard('{{ admin_api_key }}')" class="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const webhookUrl = document.getElementById('webhookUrl').value;
+            const response = await fetch('/admin/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Admin-API-Key': '{{ admin_api_key }}'
+                },
+                body: `webhook_url=${encodeURIComponent(webhookUrl)}`
+            });
+            
+            const result = await response.json();
+            alert(result.message);
+        });
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Gekopieerd naar klembord!');
+            }).catch(err => {
+                console.error('Kon niet kopiëren: ', err);
+            });
+        }
+
+        function toggleApiKey() {
+            const apiKeyInput = document.getElementById('apiKey');
+            if (apiKeyInput.type === 'password') {
+                apiKeyInput.type = 'text';
+            } else {
+                apiKeyInput.type = 'password';
+            }
+        }
+    </script>
+</body>
+</html>

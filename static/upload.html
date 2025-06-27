@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audio Transcriptie - HEIDENHAIN</title>
+    <!-- Production: Use the local build of Tailwind CSS -->
+    <!-- Development: Use the CDN with development settings -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Disable Tailwind CSS CDN warning
+        window.tailwind = { config: { theme: { extend: {} } } };
+    </script>
     
     <style>
         /* HEIDENHAIN Kleuren */
@@ -61,8 +67,21 @@
 
     <header class="bg-hh-darker shadow-md">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-             <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARAAAABDCAMAAACfAwT3AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAKeUExURQAAAP///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////y2+4JkAAAA/dFJOUwADBxEYHCEnMDw/REtUY2Vpc3uCjpSdo623vb/FyMnN0dnc4uXn6uvw8/T29/j5+vv8/f7+RAjHAAAEZElEQVR42u2d65qrIBCFRzEgKCIgKCiivff+/3d3p3SWK5mGZpLndJaZWZzKG5f0Jv1dY2NjY2NjY2Pj//2oWNe19y/O9z8B8vX4ve7r3P517U36G0TqW42gfrNpqB8tBuo7jUDRaABUNBqAFE0GoGg0ACgaDUClTqMBUNFoAEI0GoCi0QCgaDQAKRoNQFGn0QDUajQARRoNQFGn0QCIaDQAaRoNQBmNBlBGo9EAxGk0gLQaDWCsRqMBKNFoAMo0GkCjRqMBKNFoAIo0GoCSTqMBKNFoAFo0GoASjQagcKPRANRoNACFGg1AGY0GMEaj0QCkaDSAhhoNoFGjAQjSaACNNBrAUY0GEKTRACxoNAA1Gg2gUaMBKNFoAEo0GkDDjQYgRKMBpGk0AMUajQYgSaMBKNFoAAo1GgAjGg1AmUYDyNBozJb2r6s9X/c03n305z/P279v/b178V3v43t49+Kz3+N30J/z9f1f/f3lJ/+N30F/r3/vXvx276N78Vmv8/u3v734zL34bW6/+lrv47vowZ7f11/xLnzW6/yG3x/9Gu/ju/Be7+P78Lte5/drf/vevfid3of34LNe5/fpv3ovftfr/Pbd33vxb73O79v+1le/+tovf9fr/L7t3/devQ/vxWe9zu/Lf9devft779579d579R/sxWe/x+9b//Zevftbr/P71r/9l/fi972P78NnvcfvW//2X72P3+vde1/+x+99e19e/H7v20u34vte5/et/+vdfvnevfcuvfuu//O9e9+9+N17730I73r33qf37r1rL9971x689+rde6/ei3etde9d/s579169F9/13r33LnxnvXvv3nv3vv2uu/e+vXvv3nv3vv0u/8+9e9+9++y9e9+9+O51691775737r1rL96716516917336X169169371r79Lq/e/ffuc+/e+9a69+59+11e/ffus/fufevd+/a+/S6vXvv3vv0ur1/r1rv37n37XV6/1q137337XV719+6z9+5969279r79Lq/e+/e+/S6vX+vWu/eufftdXr/W7b377L171779Lq9f6/bevffus/fufevdu/bevfeuffvffpdXr/X7b3/v3qf37n37XV6/9u29e+/fZ+/d+9a7d+19+11ev/btvXvv3qf37n37XV6/1u29e+9e+y6vX+v2vv2uu/e+vXvv3nv3vv0ur97r9r79Lq9f6/a+fe+/S+vXuv2uu7/36nX7XV799t3/N69f63a+/S6vX+v2v/3vv3vv2vv3vr1ev9bt//zuvfffvfevfevfevfuvffuvffuvfvv/e/fe/fevfevfevfevfuvffuvffvvfuffvfevfevvXvv3vv3vv0ur1/r9r79//1v7/37/1737v37n17773/7717/9771r+13+X1e+/eu/fue/fee/f+/W/vw/vu//vv3v/H9+69e+/e+/d+/a+/e+//+T+/d+//+9f6ve/vvXvv3vv3vv1v7/0bHxsbGxsbGxt/B/iXwxGubwntvy8AAAAASUVORK5CYII=" alt="HEIDENHAIN Logo" style="height: 30px;">
+            <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" class="h-8 w-auto">
+                    <text x="0" y="30" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#b3b441">WHISPER</text>
+                </svg>
+                <span class="ml-2 text-white text-lg font-bold">API</span>
+            </div>
             <h1 class="text-xl font-bold uppercase">Audio Transcriptie Tool</h1>
+        </div>
+        <div>
+            <button id="settingsBtn" class="text-gray-300 hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+            </button>
         </div>
     </header>
 
@@ -94,12 +113,12 @@
                         <label class="block text-gray-700 text-sm font-bold mb-2" for="language">
                             Audiotaal:
                         </label>
-                        <select id="language" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="nl">Nederlands</option>
-                            <option value="en">Engels</option>
-                            <option value="de">Duits</option>
-                            <option value="fr">Frans</option>
-                            <option value="es">Spaans</option>
+                        <select id="language" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800">
+                            <option value="nl" class="text-gray-800">Nederlands</option>
+                            <option value="en" class="text-gray-800">Engels</option>
+                            <option value="de" class="text-gray-800">Duits</option>
+                            <option value="fr" class="text-gray-800">Frans</option>
+                            <option value="es" class="text-gray-800">Spaans</option>
                         </select>
                     </div>
                     
@@ -175,10 +194,60 @@
         </div>
     </main>
 
-    <footer class="bg-hh-dark">
-        <div class="container mx-auto py-8 px-4 text-center">
-            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARAAAABDCAMAAACfAwT3AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAKeUExURQAAAP///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////y2+4JkAAAA/dFJOUwADBxEYHCEnMDw/REtUY2Vpc3uCjpSdo623vb/FyMnN0dnc4uXn6uvw8/T29/j5+vv8/f7+RAjHAAAEZElEQVR42u2d65qrIBCFRzEgKCIgKCiivff+/3d3p3SWK5mGZpLndJaZWZzKG5f0Jv1dY2NjY2NjY2Pj//2oWNe19y/O9z8B8vX4ve7r3P517U36G0TqW42gfrNpqB8tBuo7jUDRaABUNBqAFE0GoGg0ACgaDUClTqMBUNFoAEI0GoCi0QCgaDQAKRoNQFGn0QDUajQARRoNQFGn0QCIaDQAaRoNQBmNBlBGo9EAxGk0gLQaDWCsRqMBKNFoAMo0GkCjRqMBKNFoAIo0GoCSTqMBKNFoAFo0GoASjQagcKPRANRoNACFGg1AGY0GMEaj0QCkaDSAhhoNoFGjAQjSaACNNBrAUY0GEKTRACxoNAA1Gg2gUaMBKNFoAEo0GkDDjQYgRKMBpGk0AMUajQYgSaMBKNFoAAo1GgAjGg1AmUYDyNBozJb2r6s9X/c03n305z/P279v/b178V3v43t49+Kz3+N30J/z9f1f/f3lJ/+N30F/r3/vXvx276N78Vmv8/u3v734zL34bW6/+lrv47vowZ7f11/xLnzW6/yG3x/9Gu/ju/Be7+P78Lte5/drf/vevfid3of34LNe5/fpv3ovftfr/Pbd33vxb73O79v+1le/+tovf9fr/L7t3/devQ/vxWe9zu/Lf9devft779579d579R/sxWe/x+9b//Zevftbr/P71r/9l/fi972P78NnvcfvW//2X72P3+vde1/+x+99e19e/H7v20u34vte5/et/+vdfvnevfcuvfuu//O9e9+9+N17730I73r33qf37r1rL9971x689+rde6/ei3etde9d/s579169F9/13r33LnxnvXvv3nv3vv2uu/e+vXvv3nv3vv0u/8+9e9+9++y9e9+9+O51691775737r1rL96716516917336X169169371r79Lq/e/ffuc+/e+9a69+59+11e/ffus/fufevd+/a+/S6vXvv3vv0ur1/r1rv37n37XV6/1q137337XV719+6z9+5969279r79Lq/e+/e+/S6vX+vWu/eufftdXr/W7b377L171779Lq9f6/bevffus/fufevdu/bevfeuffvffpdXr/X7b3/v3qf37n37XV6/9u29e+/fZ+/d+9a7d+19+11ev/btvXvv3qf37n37XV6/1u29e+9e+y6vX+v2vv2uu/e+vXvv3nv3vv0ur97r9r79Lq9f6/a+fe+/S+vXuv2uu7/36nX7XV799t3/N69f63a+/S6vX+v2v/3vv3vv2vv3vr1ev9bt//zuvfffvfevfevfevfuvffuvffuvfvv/e/fe/fevfevfevfevfuvffuvffvvfuffvfevfevvXvv3vv3vv0ur1/r9r79//1v7/37/1737v37n17773/7717/9771r+13+X1e+/eu/fue/fee/f+/W/vw/vu//vv3v/H9+69e+/e+/d+/a+/e+//+T+/d+//+9f6ve/vvXvv3vv3vv1v7/0bHxsbGxsbGxt/B/iXwxGubwntvy8AAAAASUVORK5CYII=" alt="HEIDENHAIN Logo" class="mx-auto" style="height: 33px;">
-            <p class="font-bold mt-2 text-white">Mastering nanometer accuracy</p>
+    <!-- Instellingen Modal -->
+    <div id="settingsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-hh-darker rounded-lg p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold">Instellingen</h3>
+                <button id="closeSettings" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="space-y-4">
+                    <div>
+                        <label for="apiKey" class="block text-sm font-medium mb-1">API Key</label>
+                        <input type="password" id="apiKey" placeholder="Vul je API key in" 
+                               class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-hh-accent">
+                        <p class="text-xs text-gray-400 mt-1">Vereist voor authenticatie</p>
+                    </div>
+                    
+                    <div class="pt-2 border-t border-gray-700">
+                        <label for="whisperApiUrl" class="block text-sm font-medium mb-1">Whisper API URL</label>
+                        <input type="text" id="whisperApiUrl" placeholder="https://jouw-domein.nl:5000" 
+                               class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-hh-accent">
+                    </div>
+                    
+                    <div>
+                        <label for="n8nWebhookUrl" class="block text-sm font-medium mb-1">n8n Webhook URL (optioneel)</label>
+                        <input type="text" id="n8nWebhookUrl" placeholder="https://jouw-n8n-instance.com/webhook/..." 
+                               class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-hh-accent">
+                        <p class="text-xs text-gray-400 mt-1">Laat leeg om de ingebouwde transcriptie te gebruiken</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 flex justify-end space-x-3">
+                <button id="cancelSettings" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-500">
+                    Annuleren
+                </button>
+                <button id="saveSettings" class="px-4 py-2 bg-hh-accent text-white rounded-md hover:bg-yellow-600">
+                    Opslaan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-hh-dark mt-8">
+        <div class="container mx-auto py-6 px-4 text-center">
+            <div class="flex items-center justify-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" class="h-6 w-auto">
+                    <text x="0" y="30" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#b3b441">WHISPER</text>
+                </svg>
+                <span class="text-white text-sm">API v1.0</span>
+            </div>
+            <p class="text-gray-400 text-sm mt-2">Audio transcriptie met Whisper AI</p>
         </div>
         <div class="bg-hh-darker">
             <div class="container mx-auto px-4 py-3">
@@ -203,92 +272,436 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <script>
-        // Initialize file input handling
-        document.addEventListener('DOMContentLoaded', function() {
-            // Copy to clipboard functionality
-            const copyBtn = document.getElementById('copyBtn');
-            copyBtn.addEventListener('click', async () => {
-                const transcript = document.getElementById('transcript').textContent;
-                try {
-                    await navigator.clipboard.writeText(transcript);
-                    
-                    // Update button text and icon temporarily
-                    const originalHTML = copyBtn.innerHTML;
-                    copyBtn.innerHTML = '<i class="fas fa-check mr-1.5"></i> Gekopieerd!';
-                    copyBtn.classList.remove('bg-gray-700', 'hover:bg-gray-600');
-                    copyBtn.classList.add('bg-green-600', 'hover:bg-green-700');
-                    
-                    // Reset button after 2 seconds
-                    setTimeout(() => {
-                        copyBtn.innerHTML = originalHTML;
-                        copyBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
-                        copyBtn.classList.add('bg-gray-700', 'hover:bg-gray-600');
-                    }, 2000);
-                } catch (err) {
-                    console.error('Failed to copy text: ', err);
-                    showError('Kon tekst niet kopiëren naar klembord');
+        // Configuratie
+        const CONFIG = {
+            whisperApiUrl: localStorage.getItem('whisperApiUrl') || 'http://localhost:5000',
+            n8nWebhookUrl: localStorage.getItem('n8nWebhookUrl') || '',
+            useN8N: false
+        };
+        
+        // API configuration - gebruik de geconfigureerde URL of standaard localhost:5000
+        let API_BASE_URL = CONFIG.whisperApiUrl;
+        let API_KEY = ''; // Wordt ingevuld bij het laden van de pagina
+        
+        // Voeg een slash toe aan het einde van de URL als die er nog niet is
+        if (API_BASE_URL && !API_BASE_URL.endsWith('/')) {
+            API_BASE_URL = API_BASE_URL + '/';
+        }
+
+        // DOM elementen
+        const settingsBtn = document.getElementById('settingsBtn');
+        const settingsModal = document.getElementById('settingsModal');
+        const closeSettings = document.getElementById('closeSettings');
+        const cancelSettings = document.getElementById('cancelSettings');
+        const saveSettings = document.getElementById('saveSettings');
+        const n8nWebhookInput = document.getElementById('n8nWebhookUrl');
+        const whisperApiUrlInput = document.getElementById('whisperApiUrl');
+        const apiKeyInput = document.getElementById('apiKey');
+
+        // Event listeners voor instellingen
+        settingsBtn.addEventListener('click', () => settingsModal.classList.remove('hidden'));
+        closeSettings.addEventListener('click', () => settingsModal.classList.add('hidden'));
+        cancelSettings.addEventListener('click', () => settingsModal.classList.add('hidden'));
+        
+        // Instellingen opslaan
+        saveSettings.addEventListener('click', () => {
+            try {
+                const whisperUrl = whisperApiUrlInput.value.trim();
+                const n8nUrl = n8nWebhookInput.value.trim();
+                const apiKey = apiKeyInput.value.trim();
+                
+                console.log('Saving settings:', { whisperUrl, n8nUrl, apiKey: apiKey ? '***' : 'not set' });
+                
+                // Valideer en sla de Whisper API URL op
+                if (whisperUrl) {
+                    try {
+                        // Eenvoudige URL validatie
+                        new URL(whisperUrl);
+                    } catch (e) {
+                        showError('Ongeldige API URL. Voer een geldige URL in (bijv. http://localhost:5000)');
+                        return;
+                    }
+                } else {
+                    showError('Voer een geldige Whisper API URL in');
+                    return;
                 }
-            });
+                
+                // Valideer API key
+                if (!apiKey) {
+                    showError('Voer een geldige API key in');
+                    return;
+                }
+                
+                // Sla alle instellingen op in localStorage
+                localStorage.setItem('whisperApiUrl', whisperUrl);
+                localStorage.setItem('n8nWebhookUrl', n8nUrl);
+                localStorage.setItem('apiKey', apiKey);
+                
+                // Update configuratie
+                API_BASE_URL = whisperUrl.endsWith('/') ? whisperUrl.slice(0, -1) : whisperUrl;
+                API_KEY = apiKey;
+                CONFIG.whisperApiUrl = API_BASE_URL;
+                CONFIG.n8nWebhookUrl = n8nUrl;
+                CONFIG.useN8N = !!n8nUrl;
+                
+                console.log('Settings saved:', { 
+                    API_BASE_URL, 
+                    useN8N: CONFIG.useN8N,
+                    hasApiKey: !!API_KEY 
+                });
+                
+                // Toon bevestiging
+                showStatus('Instellingen opgeslagen', 'success');
+                
+                // Sluit het instellingenvenster na een korte vertraging
+                setTimeout(() => {
+                    settingsModal.classList.add('hidden');
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                showError('Er is een fout opgetreden bij het opslaan van de instellingen');
+            }
+        });
+
+        // Laad opgeslagen instellingen bij het opstarten
+        function loadSettings() {
+            try {
+                const savedWhisperUrl = localStorage.getItem('whisperApiUrl');
+                const savedN8nUrl = localStorage.getItem('n8nWebhookUrl');
+                const savedApiKey = localStorage.getItem('apiKey');
+                
+                console.log('Loading settings from localStorage:', { savedWhisperUrl, savedN8nUrl, savedApiKey: savedApiKey ? '***' : 'not set' });
+                
+                // Zorg ervoor dat we altijd een standaardwaarde hebben
+                API_BASE_URL = 'http://localhost:5000';
+                
+                if (savedWhisperUrl && savedWhisperUrl.trim() !== '') {
+                    whisperApiUrlInput.value = savedWhisperUrl;
+                    CONFIG.whisperApiUrl = savedWhisperUrl;
+                    API_BASE_URL = savedWhisperUrl;
+                } else {
+                    // Standaardwaarde voor development
+                    whisperApiUrlInput.value = API_BASE_URL;
+                    CONFIG.whisperApiUrl = API_BASE_URL;
+                }
+                
+                if (savedN8nUrl && savedN8nUrl.trim() !== '') {
+                    n8nWebhookInput.value = savedN8nUrl;
+                    CONFIG.n8nWebhookUrl = savedN8nUrl;
+                    CONFIG.useN8N = true;
+                } else {
+                    CONFIG.useN8N = false;
+                }
+                
+                if (savedApiKey && savedApiKey.trim() !== '') {
+                    apiKeyInput.value = savedApiKey;
+                    API_KEY = savedApiKey;
+                } else {
+                    // Vraag alleen om API key als deze echt nodig is
+                    const apiKey = prompt('Voer de API key in:');
+                    if (apiKey && apiKey.trim() !== '') {
+                        localStorage.setItem('apiKey', apiKey);
+                        apiKeyInput.value = apiKey;
+                        API_KEY = apiKey;
+                    }
+                }
+                
+                console.log('Settings loaded:', { 
+                    API_BASE_URL, 
+                    useN8N: CONFIG.useN8N,
+                    hasApiKey: !!API_KEY 
+                });
+                
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
+        // Bestand verzenden naar n8n
+        async function sendToN8N(file) {
+            if (!CONFIG.useN8N || !CONFIG.n8nWebhookUrl) {
+                throw new Error('n8n webhook URL is niet geconfigureerd');
+            }
+
+            console.log('Sending to n8n webhook:', CONFIG.n8nWebhookUrl);
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('language', document.getElementById('language').value);
+            
+            // Voeg API key toe als deze beschikbaar is
+            if (API_KEY) {
+                formData.append('api_key', API_KEY);
+            }
+
+            try {
+                const response = await fetch(CONFIG.n8nWebhookUrl, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                console.log('n8n response status:', response.status);
+                
+                if (!response.ok) {
+                    let errorMsg = `Fout bij verzenden naar n8n: ${response.status} ${response.statusText}`;
+                    try {
+                        const errorData = await response.json();
+                        errorMsg = errorData.detail || errorData.message || errorMsg;
+                    } catch (e) {
+                        console.error('Error parsing n8n error response:', e);
+                    }
+                    throw new Error(errorMsg);
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error('Error sending to n8n:', error);
+                throw new Error(`Fout bij verzenden naar n8n: ${error.message}`);
+            }
+        }
+
+        // Haal de API configuratie op
+        async function loadApiConfig() {
+            try {
+                console.log('Loading API config from:', API_BASE_URL);
+                const response = await fetch(`${API_BASE_URL}/api/config`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const config = await response.json();
+                console.log('API config loaded:', config);
+                
+                return true;
+            } catch (error) {
+                console.error('Fout bij ophalen API configuratie:', error);
+                // Toon alleen een melding als de API key nog niet is ingesteld
+                if (!API_KEY) {
+                    alert('Kan geen verbinding maken met de server. Controleer de URL en probeer het opnieuw.');
+                }
+                return false;
+            }
+        }
+
+        // Initialize the application when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadSettings();
+            
+            // Controleer of er een API-sleutel is ingesteld
+            if (!API_KEY) {
+                // Als er geen API-sleutel is, vraag deze dan aan de gebruiker
+                const apiKey = prompt('Voer de API-sleutel in (gebruik "test123" voor testen):');
+                if (apiKey && apiKey.trim() !== '') {
+                    localStorage.setItem('apiKey', apiKey);
+                    API_KEY = apiKey;
+                    console.log('API key set from prompt');
+                    // Update de UI na het instellen van de API-sleutel
+                    updateUI();
+                }
+            }
+            
+            await loadApiConfig();
+            
+            // Initialize UI elements
+            const copyBtn = document.getElementById('copyBtn');
             const dropZone = document.getElementById('dropZone');
             const fileInput = document.getElementById('audioFile');
             const fileName = document.getElementById('fileName');
+            const uploadForm = document.getElementById('uploadForm');
+            
+            // Initialize copy to clipboard functionality
+            if (copyBtn) {
+                copyBtn.addEventListener('click', async () => {
+                    const transcript = document.getElementById('transcript').textContent;
+                    try {
+                        await navigator.clipboard.writeText(transcript);
+                        
+                        // Update button text and icon temporarily
+                        const originalHTML = copyBtn.innerHTML;
+                        copyBtn.innerHTML = '<i class="fas fa-check mr-1.5"></i> Gekopieerd!';
+                        copyBtn.classList.remove('bg-gray-700', 'hover:bg-gray-600');
+                        copyBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                        
+                        // Reset button after 2 seconds
+                        setTimeout(() => {
+                            copyBtn.innerHTML = originalHTML;
+                            copyBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                            copyBtn.classList.add('bg-gray-700', 'hover:bg-gray-600');
+                        }, 2000);
+                    } catch (err) {
+                        console.error('Failed to copy text: ', err);
+                        showError('Kon tekst niet kopiëren naar klembord');
+                    }
+                });
+            }
             
             // Handle file selection via button
-            dropZone.addEventListener('click', () => fileInput.click());
-            
-            // Handle file input change
-            fileInput.addEventListener('change', (e) => {
-                if (fileInput.files.length > 0) {
-                    updateFileName(fileInput.files[0].name);
-                }
-            });
-            
-            // Handle drag and drop
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                dropZone.addEventListener(eventName, preventDefaults, false);
-                document.body.addEventListener(eventName, preventDefaults, false);
-            });
-            
-            // Highlight drop zone when item is dragged over it
-            ['dragenter', 'dragover'].forEach(eventName => {
-                dropZone.addEventListener(eventName, highlight, false);
-            });
-            
-            ['dragleave', 'drop'].forEach(eventName => {
-                dropZone.addEventListener(eventName, unhighlight, false);
-            });
-            
-            // Handle dropped files
-            dropZone.addEventListener('drop', handleDrop, false);
-            
-            function preventDefaults(e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-            
-            function highlight() {
-                dropZone.classList.add('border-hh-accent', 'bg-hh-darker/50');
-            }
-            
-            function unhighlight() {
-                dropZone.classList.remove('border-hh-accent', 'bg-hh-darker/50');
-            }
-            
-            function handleDrop(e) {
-                const dt = e.dataTransfer;
-                const files = dt.files;
+            if (dropZone && fileInput) {
+                dropZone.addEventListener('click', () => fileInput.click());
                 
-                if (files.length) {
-                    fileInput.files = files;
-                    updateFileName(files[0].name);
-                }
+                // Handle file input change
+                fileInput.addEventListener('change', (e) => {
+                    if (fileInput.files.length > 0) {
+                        updateFileName(fileInput.files[0].name);
+                    }
+                });
+                
+                // Handle drag and drop
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, preventDefaults, false);
+                    document.body.addEventListener(eventName, preventDefaults, false);
+                });
+                
+                // Highlight drop zone when item is dragged over it
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, highlight, false);
+                });
+                
+                ['dragleave', 'drop'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, unhighlight, false);
+                });
+                
+                // Handle dropped files
+                dropZone.addEventListener('drop', handleDrop, false);
             }
             
-            function updateFileName(name) {
-                fileName.textContent = name || 'Geen bestand geselecteerd';
+            // Handle form submission
+            if (uploadForm) {
+                uploadForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    if (!fileInput || fileInput.files.length === 0) {
+                        showError('Selecteer eerst een audiobestand');
+                        return;
+                    }
+                    
+                    const file = fileInput.files[0];
+                    const language = document.getElementById('language').value;
+                    
+                    // Reset UI
+                    showStatus('Bezig met verwerken...', 'uploading');
+                    document.getElementById('result').classList.add('hidden');
+                    document.getElementById('error').classList.add('hidden');
+                    
+                    try {
+                        // Controleer of er een API key is
+                        if (!API_KEY) {
+                            throw new Error('Geen API key ingesteld. Voer een geldige API key in via de instellingen.');
+                        }
+                        
+                        console.log('Starting file upload with config:', {
+                            API_BASE_URL,
+                            language,
+                            fileSize: file.size,
+                            fileName: file.name,
+                            useN8N: CONFIG.useN8N
+                        });
+                        
+                        let result;
+                        
+                        if (CONFIG.useN8N) {
+                            // Verstuur naar n8n webhook
+                            showStatus('Bestand wordt naar n8n gestuurd...', 'processing');
+                            result = await sendToN8N(file);
+                            showResult(result.transcript || 'Geen transcriptie ontvangen');
+                        } else {
+                            // Originele uploadlogica naar lokale API
+                            showStatus('Bestand wordt verwerkt...', 'processing');
+                            
+                            const formData = new FormData();
+                            formData.append('file', file);
+                            formData.append('language', language);
+                            
+                            console.log('Sending request to:', `${API_BASE_URL}/api/transcribe`);
+                            
+                            // Verwijder de Content-Type header zodat de browser de juiste boundary kan instellen
+                            const response = await fetch(`${API_BASE_URL}/api/transcribe`, {
+                                method: 'POST',
+                                headers: {
+                                    'x-admin-api-key': API_KEY,
+                                    'Accept': 'application/json'
+                                },
+                                body: formData
+                            });
+                            
+                            console.log('Upload response status:', response.status);
+                            
+                            if (!response.ok) {
+                                let errorDetail = 'Er is een fout opgetreden bij het uploaden';
+                                try {
+                                    const errorData = await response.json();
+                                    errorDetail = errorData.detail || errorData.message || errorDetail;
+                                } catch (e) {
+                                    console.error('Error parsing error response:', e);
+                                }
+                                throw new Error(errorDetail);
+                            }
+                            
+                            const data = await response.json();
+                            console.log('Upload response data:', data);
+                            
+                            if (data.status === 'processing') {
+                                // Poll for status
+                                checkTranscriptionStatus(data.task_id);
+                                return;
+                            } else if (data.status === 'completed') {
+                                result = data.text;
+                            } else {
+                                throw new Error('Onverwachte status ontvangen: ' + (data.status || 'onbekend'));
+                            }
+                            
+                            showResult(result);
+                        }
+                    } catch (error) {
+                        console.error('Upload fout:', error);
+                        showError(error.message || 'Er is een fout opgetreden');
+                    }
+                });
             }
         });
         
+        // Helper functions for drag and drop
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        function highlight() {
+            const dropZone = document.getElementById('dropZone');
+            if (dropZone) {
+                dropZone.classList.add('border-blue-500', 'bg-gray-800');
+            }
+        }
+        
+        function unhighlight() {
+            const dropZone = document.getElementById('dropZone');
+            if (dropZone) {
+                dropZone.classList.remove('border-blue-500', 'bg-gray-800');
+            }
+        }
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            const fileInput = document.getElementById('audioFile');
+            
+            if (files.length > 0 && fileInput) {
+                fileInput.files = files;
+                updateFileName(files[0].name);
+            }
+        }
+        
+        function updateFileName(name) {
+            const fileName = document.getElementById('fileName');
+            if (fileName) {
+                fileName.textContent = name;
+                fileName.classList.remove('text-gray-400');
+                fileName.classList.add('text-white');
+            }
+        }
+
         // Load example file
         function loadExample(exampleId) {
             // Reset any previous state
@@ -325,9 +738,11 @@
                 }, 1000);
             }, 500);
         }
-        // API configuration - altijd poort 5000 gebruiken voor de API
-        const API_BASE_URL = 'http://localhost:5000';
-        const API_KEY = 'hofP20MHXVh5ZhI30QXHA_ly_zqG__ktnQtQpwmXnoo';
+        // API configuration - wordt nu ingesteld in de CONFIG en kan worden aangepast via instellingen
+        // Zorg ervoor dat API_BASE_URL geen trailing slash heeft
+        if (API_BASE_URL.endsWith('/')) {
+            API_BASE_URL = API_BASE_URL.slice(0, -1);
+        }
         
         // DOM elements
         const form = document.getElementById('uploadForm');
@@ -346,6 +761,7 @@
             
             const fileInput = document.getElementById('audioFile');
             const file = fileInput.files[0];
+            const language = document.getElementById('language').value;
             
             if (!file) {
                 showError('Selecteer eerst een audiobestand');
@@ -353,72 +769,58 @@
             }
 
             // Reset UI
-            showStatus('Bezig met uploaden...', 'uploading');
+            showStatus('Bezig met verwerken...', 'uploading');
             document.getElementById('result').classList.add('hidden');
             document.getElementById('error').classList.add('hidden');
             
-            // Get selected language
-            const language = document.getElementById('language').value;
-            
-            // Prepare form data
-            const formData = new FormData();
-            formData.append('file', file);
-            
-            // Add language and other parameters
-            const params = {
-                language: language,
-                task: 'transcribe',
-                batch_size: 16
-            };
-            
-            // Add params to form data
-            for (const key in params) {
-                formData.append(key, params[key]);
-            }
-            
-            // Add API key to headers
-            const headers = {
-                'X-Admin-API-Key': 'your-secret-key'  // In production, use environment variables
-            };
-            
             try {
-                // Start the upload
-                showStatus('Bestand uploaden...', 'uploading');
+                let result;
                 
-                const response = await fetch(`${API_BASE_URL}/api/transcribe`, {
-                    method: 'POST',
-                    headers: {
-                        'X-Admin-API-Key': API_KEY
-                    },
-                    body: formData
-                });
-
-                if (!response.ok) {
-                    let errorMessage = `Serverfout: ${response.status} ${response.statusText}`;
-                    try {
-                        const errorData = await response.json();
-                        console.log('Error response:', errorData);
-                        errorMessage = errorData.detail || errorData.message || JSON.stringify(errorData);
-                    } catch (e) {
-                        console.error('Error parsing error response:', e);
-                    }
-                    throw new Error(errorMessage);
-                }
-
-                const data = await response.json();
-                
-                if (data.status === 'completed') {
-                    showStatus('Transcriptie voltooid!', 'success');
-                    showResult(data.text || 'Geen tekst gevonden');
-                } else if (data.status === 'processing') {
-                    // If the API returns a task ID, poll for updates
+                if (CONFIG.useN8N) {
+                    // Verstuur naar n8n webhook
+                    showStatus('Bestand wordt naar n8n gestuurd...', 'processing');
+                    result = await sendToN8N(file);
+                    showResult(result.transcript || 'Geen transcriptie ontvangen');
+                } else {
+                    // Originele uploadlogica naar lokale API
                     showStatus('Bestand wordt verwerkt...', 'processing');
-                    await checkTranscriptionStatus(data.task_id);
+                    
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    
+                    const apiUrl = `${API_BASE_URL}/api/transcribe?language=${language}`;
+                    console.log('API URL:', apiUrl);
+                    
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'X-Admin-API-Key': API_KEY
+                        },
+                        body: formData
+                    });
+                    
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.detail || 'Er is een fout opgetreden bij het uploaden');
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.status === 'processing') {
+                        // Poll for status
+                        checkTranscriptionStatus(data.task_id);
+                        return;
+                    } else if (data.status === 'completed') {
+                        result = data.text;
+                    } else {
+                        throw new Error('Onverwachte status ontvangen');
+                    }
+                    
+                    showResult(result);
                 }
-                
-            } catch (err) {
-                showError(`Fout bij het verwerken: ${err.message}`);
-                console.error('Transcription error:', err);
+            } catch (error) {
+                console.error('Upload fout:', error);
+                showError(error.message || 'Er is een fout opgetreden');
             }
         });
         
@@ -435,7 +837,9 @@
                 // Update status with attempt counter
                 showStatus(`Bestand wordt verwerkt (poging ${attempt}/${MAX_ATTEMPTS})...`, 'processing');
                 
-                const response = await fetch(`${API_BASE_URL}/api/status/${taskId}`, {
+                const statusUrl = `${API_BASE_URL}/api/status/${taskId}`;
+                console.log('Status URL:', statusUrl);
+                const response = await fetch(statusUrl, {
                     headers: {
                         'X-Admin-API-Key': API_KEY,
                         'Cache-Control': 'no-cache',
@@ -495,22 +899,26 @@
                 .replace(/\n\s*\n/g, '\n\n') // Preserve double line breaks
                 .trim();
             
-            // Display the formatted text
-            transcriptElement.textContent = formattedText;
+            // Display the formatted text with proper HTML line breaks
+            transcriptElement.innerHTML = formattedText.replace(/\n/g, '<br>');
             
             // Set up download button
             if (formattedText) {
                 const blob = new Blob([formattedText], { type: 'text/plain;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
                 
-                downloadBtn.href = url;
-                downloadBtn.download = `transcriptie-${new Date().toISOString().slice(0, 10)}.txt`;
-                downloadBtn.classList.remove('hidden');
+                // Update download button
+                downloadBtn.onclick = () => {
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `transcript-${new Date().toISOString().slice(0, 10)}.txt`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                };
                 
-                // Clean up the URL object when the download is complete
-                downloadBtn.addEventListener('click', function onClick() {
-                    setTimeout(() => URL.revokeObjectURL(url), 100);
-                }, { once: true });
+                downloadBtn.classList.remove('hidden');
             } else {
                 downloadBtn.classList.add('hidden');
             }
@@ -570,6 +978,8 @@
             // Log to console for debugging
             console.error('Error:', message);
         }
+        
+
     </script>
     
 </body>

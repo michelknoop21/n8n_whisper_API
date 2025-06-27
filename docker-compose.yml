@@ -1,14 +1,18 @@
+version: '3.8'
+
 services:
   whisper-api:
     build: .
     ports:
       - "5000:5000"
+    env_file:
+      - .env
     environment:
-      - ADMIN_KEY=hofP20MHXVh5ZhI30QXHA_ly_zqG__ktnQtQpwmXnoo
       - CORS_ORIGINS=*
       - CORS_METHODS=*
       - CORS_HEADERS=*
       - PYTHONUNBUFFERED=1
+      - ADMIN_KEY=hofP20MHXVh5ZhI30QXHA_ly_zqG__ktnQtQpwmXnoo  # API-sleutel voor authenticatie
     volumes:
       - .:/app
     working_dir: /app
