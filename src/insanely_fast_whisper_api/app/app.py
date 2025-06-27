@@ -340,9 +340,6 @@ async def transcribe_audio(
                     # Prepare generation kwargs
                     generate_kwargs = {
                         "task": "transcribe",
-                        "return_timestamps": True,
-                        "chunk_length_s": 30,
-                        "batch_size": 16,
                         "language": (
                             language if language and language != "auto" else None
                         ),
@@ -350,7 +347,13 @@ async def transcribe_audio(
 
                     # Run transcription
                     logger.info("Starting transcription...")
-                    result = pipeline(str(output_file), **generate_kwargs)
+                    result = pipeline(
+                        str(output_file),
+                        chunk_length_s=30,
+                        batch_size=16,
+                        return_timestamps=True,
+                        generate_kwargs=generate_kwargs,
+                    )
 
                     # Format the result
                     segments = []
@@ -414,11 +417,15 @@ async def process_sync_transcription(request: TranscriptionRequest, task_id: str
         pipeline = get_whisper_pipeline()
 
         # Transcribe audio
+        generate_kwargs = {
+            "task": request.task,
+            "language": request.language if request.language else None,
+        }
         result = pipeline(
             audio_path,
-            language=request.language,
             batch_size=request.batch_size,
             return_timestamps=request.timestamp != "none",
+            generate_kwargs=generate_kwargs,
         )
 
         # Clean up
