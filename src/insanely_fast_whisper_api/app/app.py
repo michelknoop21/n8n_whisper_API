@@ -256,13 +256,21 @@ async def transcribe_audio(
                 # Get the transcription pipeline
                 pipeline = get_whisper_pipeline()
                 
-                # Transcribe audio
-                logger.info(f"Starting transcription of {output_file}...")
+                # Get language from form data or use auto-detect
+                language = 'nl'  # Default to Dutch
+                
+                # Log the language being used
+                logger.info(f"Starting transcription of {output_file} (language: {language or 'auto'})...")
+                
                 try:
+                    # Prepare generation kwargs
+                    generate_kwargs = {"language": language} if language else {}
+                    
                     result = pipeline(
                         str(output_file),
                         batch_size=16,  # Reduced batch size for better memory management
-                        return_timestamps=False
+                        return_timestamps=False,
+                        generate_kwargs=generate_kwargs if generate_kwargs else None
                     )
                     
                     # Log the raw result for debugging
