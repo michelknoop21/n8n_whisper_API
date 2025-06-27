@@ -97,3 +97,17 @@ GET /health
 ## License
 
 MIT
+
+## Generalisatie en Template
+
+Deze applicatie biedt een REST API op basis van FastAPI waarmee audiobestanden worden getranscribeerd via OpenAI's Whisper-model.
+Om dit project verder te generaliseren voor gebruik bij verschillende klanten kunnen onderstaande stappen worden gevolgd:
+
+1. **Configuratie scheiden**: gebruik `.env` of container-omgevingsvariabelen voor waarden zoals het model, toegestane domeinen (CORS) en de admin-sleutel.
+2. **Docker templatiseren**: maak een standaard `docker-compose.yml` die eenvoudig aanpasbaar is per klant en een `Dockerfile` die variabelen accepteert.
+3. **Webhook integraties**: definieer duidelijke hooks (zoals `/webhook/transcribe`) die per klant ingesteld kunnen worden.
+4. **Opschalen en queueing**: implementeer optioneel een wachtrij (bijv. via Redis) zodat grote aantallen bestanden asynchroon verwerkt kunnen worden.
+5. **Documentatie**: lever een stappenplan voor installatie en configuratie zodat nieuwe omgevingen snel uitgerold kunnen worden.
+
+Met deze aanpak kan dezelfde basiscode als sjabloon dienen terwijl specifieke instellingen per klant in configuratiebestanden worden vastgelegd.
+
