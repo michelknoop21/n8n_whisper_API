@@ -8,12 +8,37 @@ services:
     env_file:
       - .env
     environment:
-      - CORS_ORIGINS=*
-      - CORS_METHODS=*
-      - CORS_HEADERS=*
+      - CORS_ORIGINS=${CORS_ORIGINS}
+      - CORS_METHODS=${CORS_METHODS}
+      - CORS_HEADERS=${CORS_HEADERS}
       - PYTHONUNBUFFERED=1
-      - ADMIN_KEY=hofP20MHXVh5ZhI30QXHA_ly_zqG__ktnQtQpwmXnoo  # API-sleutel voor authenticatie
+      - ADMIN_KEY=${ADMIN_KEY}
+      - WHISPER_MODEL=${WHISPER_MODEL}
+      - USE_REDIS_QUEUE=${USE_REDIS_QUEUE}
+      - REDIS_URL=${REDIS_URL}
     volumes:
       - .:/app
+      - ./data:/tmp/whisper_uploads
     working_dir: /app
+    restart: unless-stopped
+
+  worker:
+    build: .
+    command: ["python", "-m", "insanely_fast_whisper_api.app.worker"]
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - ADMIN_KEY=${ADMIN_KEY}
+      - WHISPER_MODEL=${WHISPER_MODEL}
+      - REDIS_URL=${REDIS_URL}
+    volumes:
+      - .:/app
+      - ./data:/tmp/whisper_uploads
+    working_dir: /app
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7
     restart: unless-stopped
