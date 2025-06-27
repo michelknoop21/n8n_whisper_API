@@ -89,6 +89,20 @@
                         </div>
                     </div>
                     
+                    <!-- Taalselectie -->
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="language">
+                            Audiotaal:
+                        </label>
+                        <select id="language" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="nl">Nederlands</option>
+                            <option value="en">Engels</option>
+                            <option value="de">Duits</option>
+                            <option value="fr">Frans</option>
+                            <option value="es">Spaans</option>
+                        </select>
+                    </div>
+                    
                     <!-- Voorbeeldbestanden -->
                     <div class="mt-4">
                         <p class="text-sm text-gray-400 mb-2">Of probeer een voorbeeld:</p>
@@ -343,19 +357,31 @@
             document.getElementById('result').classList.add('hidden');
             document.getElementById('error').classList.add('hidden');
             
+            // Get selected language
+            const language = document.getElementById('language').value;
+            
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            // Add language and other parameters
+            const params = {
+                language: language,
+                task: 'transcribe',
+                batch_size: 16
+            };
+            
+            // Add params to form data
+            for (const key in params) {
+                formData.append(key, params[key]);
+            }
+            
+            // Add API key to headers
+            const headers = {
+                'X-Admin-API-Key': 'your-secret-key'  // In production, use environment variables
+            };
+            
             try {
-                const formData = new FormData();
-                formData.append('file', file);
-
-                // Show upload progress
-                const xhr = new XMLHttpRequest();
-                xhr.upload.addEventListener('progress', (e) => {
-                    if (e.lengthComputable) {
-                        const percentComplete = Math.round((e.loaded / e.total) * 100);
-                        document.getElementById('progress').style.width = `${percentComplete}%`;
-                    }
-                });
-
                 // Start the upload
                 showStatus('Bestand uploaden...', 'uploading');
                 
@@ -368,15 +394,22 @@
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.detail || `Serverfout: ${response.status}`);
+                    let errorMessage = `Serverfout: ${response.status} ${response.statusText}`;
+                    try {
+                        const errorData = await response.json();
+                        console.log('Error response:', errorData);
+                        errorMessage = errorData.detail || errorData.message || JSON.stringify(errorData);
+                    } catch (e) {
+                        console.error('Error parsing error response:', e);
+                    }
+                    throw new Error(errorMessage);
                 }
 
                 const data = await response.json();
                 
                 if (data.status === 'completed') {
                     showStatus('Transcriptie voltooid!', 'success');
-                    showResult(data.transcription || 'Geen tekst gevonden');
+                    showResult(data.text || 'Geen tekst gevonden');
                 } else if (data.status === 'processing') {
                     // If the API returns a task ID, poll for updates
                     showStatus('Bestand wordt verwerkt...', 'processing');
@@ -391,8 +424,12 @@
         
         // Check transcription status for async processing
         async function checkTranscriptionStatus(taskId, attempt = 1) {
-            const MAX_ATTEMPTS = 30; // Max 30 attempts (about 1 minute with 2s delay)
+            const MAX_ATTEMPTS = 30;
             const RETRY_DELAY = 2000; // 2 seconds
+            
+            if (attempt > MAX_ATTEMPTS) {
+                throw new Error('Time-out: De verwerking duurt langer dan verwacht. Probeer het later opnieuw.');
+            }
             
             try {
                 // Update status with attempt counter

@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     gcc \
     python3-dev \
     libsndfile1 \
+    libavcodec-extra \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first

@@ -1,7 +1,7 @@
-from fastapi import FastAPI, HTTPException, UploadFile, File, Header, Request, BackgroundTasks, APIRouter
+from fastapi import FastAPI, HTTPException, UploadFile, File, Header, Request, BackgroundTasks, APIRouter, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Tuple
 import torch
 from transformers import pipeline
 import os
@@ -11,6 +11,30 @@ from datetime import datetime
 import aiohttp
 import tempfile
 from pathlib import Path
+import mimetypes
+import logging
+import subprocess
+import shutil
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Supported audio formats
+SUPPORTED_AUDIO_TYPES = [
+    'audio/wav',
+    'audio/mpeg',
+    'audio/mp3',
+    'audio/x-wav',
+    'audio/x-m4a',
+    'audio/mp4',
+    'audio/aac',
+    'audio/ogg',
+    'audio/webm'
+]
+
+# Maximum file size (50MB)
+MAX_FILE_SIZE = 50 * 1024 * 1024
 
 # Create main FastAPI app
 app = FastAPI(title="Insanely Fast Whisper API")
@@ -53,12 +77,32 @@ whisper_pipeline = None
 def get_whisper_pipeline():
     global whisper_pipeline
     if whisper_pipeline is None:
-        whisper_pipeline = pipeline(
-            "automatic-speech-recognition",
-            model="openai/whisper-base",
-            device=0 if torch.cuda.is_available() else -1,
-            torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32
-        )
+        logger.info("Initializing Whisper pipeline...")
+        device = 0 if torch.cuda.is_available() else -1
+        torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
+        
+        logger.info(f"Using device: {'CUDA' if device >= 0 else 'CPU'}")
+        logger.info(f"Using torch_dtype: {torch_dtype}")
+        
+        # Use a larger model for better accuracy
+        model_name = "openai/whisper-small"
+        logger.info(f"Loading model: {model_name}")
+        
+        try:
+            whisper_pipeline = pipeline(
+                "automatic-speech-recognition",
+                model=model_name,
+                device=device,
+                torch_dtype=torch_dtype,
+                chunk_length_s=30,  # Process in 30-second chunks
+                stride_length_s=5,   # Overlap chunks by 5 seconds
+                return_timestamps=False
+            )
+            logger.info("Whisper pipeline initialized successfully")
+        except Exception as e:
+            logger.error(f"Failed to initialize Whisper pipeline: {str(e)}")
+            raise
+            
     return whisper_pipeline
 
 # Utility functions
@@ -81,6 +125,85 @@ async def download_audio(url: str) -> str:
     
     return str(temp_file)
 
+def convert_audio(input_path: str, output_path: str = None) -> str:
+    """Convert audio file to WAV format using FFmpeg."""
+    if output_path is None:
+        output_path = str(Path(input_path).with_suffix('.wav'))
+    
+    try:
+        # Convert to WAV with 16kHz sample rate and mono channel
+        cmd = [
+            'ffmpeg',
+            '-i', input_path,    # Input file
+            '-ar', '16000',     # Audio sample rate
+            '-ac', '1',         # Mono audio
+            '-y',               # Overwrite output file if it exists
+            output_path
+        ]
+        
+        result = subprocess.run(
+            cmd,
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+        logger.info(f"Audio converted successfully: {output_path}")
+        return output_path
+    except subprocess.CalledProcessError as e:
+        logger.error(f"FFmpeg conversion failed: {e.stderr.decode()}")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Kon het audiobestand niet converteren naar een bruikbaar formaat"
+        )
+
+async def validate_uploaded_file(file: UploadFile) -> dict:
+    """Validate the uploaded file and return file info."""
+    # Check file size
+    file.file.seek(0, 2)  # Move to end of file
+    file_size = file.file.tell()
+    file.file.seek(0)  # Reset file pointer
+    
+    if file_size > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"Bestand is te groot. Maximale grootte is {MAX_FILE_SIZE/1024/1024}MB"
+        )
+    
+    # Get file extension
+    file_extension = Path(file.filename).suffix.lower()
+    
+    # Check if FFmpeg is available
+    ffmpeg_available = shutil.which('ffmpeg') is not None
+    
+    # If FFmpeg is not available, only allow WAV files
+    if not ffmpeg_available and file_extension != '.wav':
+        raise HTTPException(
+            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            detail="Alleen WAV-bestanden worden ondersteund. Installeer FFmpeg voor ondersteuning van meer formaten."
+        )
+    
+    # Check file type
+    content_type = file.content_type
+    if not content_type:
+        # Try to guess content type from filename
+        content_type = mimetypes.guess_type(file.filename)[0]
+    
+    # If we couldn't determine content type, try to proceed anyway if FFmpeg is available
+    if not content_type and not ffmpeg_available:
+        raise HTTPException(
+            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            detail="Kon het bestandstype niet bepalen"
+        )
+    
+    # Check if the file needs conversion
+    needs_conversion = file_extension not in ['.wav', '.mp3']
+    
+    return {
+        'needs_conversion': needs_conversion,
+        'extension': file_extension,
+        'content_type': content_type
+    }
+
 # API Endpoints
 @api_router.post("/transcribe")
 async def transcribe_audio(
@@ -102,31 +225,81 @@ async def transcribe_audio(
     
     try:
         if file:
-            # Handle file upload
-            temp_file = Path(tempfile.gettempdir()) / f"audio_{task_id}_{file.filename}"
-            with open(temp_file, "wb") as buffer:
-                content = await file.read()
-                buffer.write(content)
+            # Create temp directory if it doesn't exist
+            temp_dir = Path(tempfile.gettempdir()) / "whisper_uploads"
+            temp_dir.mkdir(exist_ok=True, parents=True)
             
-            # Get the transcription pipeline
-            pipeline = get_whisper_pipeline()
+            # Save uploaded file
+            temp_file = temp_dir / f"audio_{task_id}_{file.filename}"
+            output_file = temp_file.with_suffix('.wav')
             
-            # Transcribe audio
-            result = pipeline(
-                str(temp_file),
-                batch_size=64,
-                return_timestamps=False
-            )
-            
-            # Clean up
-            temp_file.unlink()
-            
-            return TranscriptionResponse(
-                text=result["text"],
-                task_id=task_id,
-                status="completed",
-                created_at=datetime.utcnow(),
-            )
+            try:
+                # Save uploaded file
+                with open(temp_file, "wb") as buffer:
+                    content = await file.read()
+                    buffer.write(content)
+                
+                logger.info(f"File saved to {temp_file}")
+                
+                # Validate file and check if conversion is needed
+                file_info = await validate_uploaded_file(file)
+                
+                # Convert audio if needed
+                if file_info['needs_conversion']:
+                    logger.info(f"Converting {temp_file} to WAV format...")
+                    convert_audio(str(temp_file), str(output_file))
+                    # Remove original file after conversion
+                    temp_file.unlink()
+                else:
+                    output_file = temp_file
+                
+                # Get the transcription pipeline
+                pipeline = get_whisper_pipeline()
+                
+                # Transcribe audio
+                logger.info(f"Starting transcription of {output_file}...")
+                try:
+                    result = pipeline(
+                        str(output_file),
+                        batch_size=16,  # Reduced batch size for better memory management
+                        return_timestamps=False
+                    )
+                    
+                    # Log the raw result for debugging
+                    logger.info(f"Raw transcription result: {result}")
+                    
+                    # Ensure we have text in the result
+                    if not result or 'text' not in result or not result['text'].strip():
+                        logger.warning("No text was transcribed. The audio might be silent or contain no speech.")
+                        result['text'] = "Geen spraak herkend in het audiobestand."
+                    else:
+                        logger.info("Transcription completed successfully")
+                        
+                except Exception as e:
+                    logger.error(f"Error during transcription: {str(e)}")
+                    raise
+                
+                return TranscriptionResponse(
+                    text=result["text"],
+                    task_id=task_id,
+                    status="completed",
+                    created_at=datetime.utcnow(),
+                )
+                
+            except Exception as e:
+                logger.error(f"Error during transcription: {str(e)}", exc_info=True)
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail=f"Fout bij het verwerken van het audiobestand: {str(e)}"
+                )
+                
+            finally:
+                # Clean up
+                try:
+                    if temp_file.exists():
+                        temp_file.unlink()
+                except Exception as e:
+                    logger.warning(f"Failed to delete temp file {temp_file}: {e}")
             
         elif request and request.url:
             # Handle URL transcription (async)
