@@ -1,5 +1,8 @@
 FROM python:3.10-slim
 
+ARG WHISPER_MODEL=openai/whisper-small
+ARG ADMIN_KEY=default-admin-key-change-me
+
 # Set working directory
 WORKDIR /app
 
@@ -40,8 +43,9 @@ EXPOSE 5000
 ENV PYTHONPATH="/app"
 ENV PYTHONUNBUFFERED="1"
 
-# Set a default admin key (should be overridden in docker-compose)
-ENV ADMIN_KEY="default-admin-key-change-me"
+# Set variables that can be overridden at runtime
+ENV ADMIN_KEY=${ADMIN_KEY}
+ENV WHISPER_MODEL=${WHISPER_MODEL}
 
 # Create a non-root user and switch to it
 RUN useradd -m appuser && \
